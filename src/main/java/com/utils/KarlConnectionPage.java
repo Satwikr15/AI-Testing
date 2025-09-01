@@ -7,13 +7,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 import java.time.Duration;
 
 public class KarlConnectionPage {
     WebDriver driver;
-    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
+    WebDriverWait wait;
 
     public KarlConnectionPage(WebDriver driver) {
         this.driver = driver;
@@ -21,31 +19,32 @@ public class KarlConnectionPage {
     }
 
     // ✅ Reusable method
-    public void selectConnection(String connectionXpathKey,String DataBase) {
-        // Step 1: open dropdown
+    public void selectConnection(String connectionXpathKey) {
+        // open dropdown
         WebElement connectiondropdown = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty(connectionXpathKey))));
+                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("connectiondropdown"))));
         connectiondropdown.click();
 
-        // Step 2: Choose the option
-        String optionToSelect = DataBase; // can be Karl, Karl-Fabric, etc.
-        WebElement connectionOption = wait.until(ExpectedConditions
-                .elementToBeClickable(By.xpath("//ul[@class='p-dropdown-items']//li[.//span[normalize-space(text())='" + optionToSelect + "']]")));
-        connectionOption.click();
+        // select connection dynamically
+        WebElement option = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("karlconnection"))));
+        option.click();
 
-        WebElement ConnectBtn=wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("Connectbtn"))));
-        ConnectBtn.click();
+        // click Done
+        WebElement doneBtn = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("Donebtn"))));
+        doneBtn.click();
 
-//        // validate connection added
-//        WebElement message = wait.until(
-//                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("ValidationText"))));
+        // validate connection added
+        WebElement message = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath(ConfigReader.getProperty("connectionadded"))));
 
-//        if (message.isDisplayed()) {
-//            message.click();
-//            ScreenshotUtil.captureScreenshot("After connection done ");
-//        } else {
-//            System.out.println("Connection not done: " + connectionXpathKey);
-//        }
+        if (message.isDisplayed()) {
+            message.click();
+            ScreenshotUtil.captureScreenshot("After connection done ");
+        } else {
+            System.out.println("Connection not done: " + connectionXpathKey);
+        }
     }
 }
 
