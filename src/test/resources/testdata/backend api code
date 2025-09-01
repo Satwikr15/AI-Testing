@@ -1,0 +1,183 @@
+
+
+//    @Then("user sends query {string} and captures the response screenshot")
+//    public void send_query_and_capture_response(String query) {
+//        JSONObject configJson;
+//
+//        // Step 1: Hit getConfig API
+//        try {
+//            HttpResponse<String> configResponse = Unirest.get("https://dev.ai-workbench.flipnow.cloud/document-copilot/api/getConfig/")
+//                    .queryString("userId", "737dced4-d8ae-4eeb-bfcb-dc2304491eac")
+//                    .asString();
+//
+//            System.out.println("✅ GET Config API Response Code: " + configResponse.getStatus());
+//
+//            if (configResponse.getStatus() != 200) {
+//                throw new RuntimeException("⚠️ Failed to hit config API. Response Code: " + configResponse.getStatus());
+//            }
+//
+//            configJson = new JSONObject(configResponse.getBody());
+//            System.out.println("✅ Config API Response Body: " + configJson.toString());
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException("⚠️ Error while calling getConfig API", e);
+//        }
+//
+//        // Step 2: Call createChat API
+//        try {
+//            JSONObject payload = new JSONObject();
+//            payload.put("user_id", "737dced4-d8ae-4eeb-bfcb-dc2304491eac");
+//            payload.put("title", query);
+//            payload.put("configuration", configJson);
+//
+//            HttpResponse<String> createResponse = Unirest.post("https://dev.ai-workbench.flipnow.cloud/document-copilot/api/createChat")
+//                    .header("Content-Type", "application/json")
+//                    .body(payload.toString())
+//                    .asString();
+//
+//            System.out.println("✅ createChat Response Code: " + createResponse.getStatus());
+//            System.out.println("✅ createChat Response Body: " + createResponse.getBody());
+//
+//            if (createResponse.getStatus() != 200 || createResponse.getBody().contains("error")) {
+//                ScreenshotUtil.captureScreenshot("CreateChat_API_Failed");
+//                throw new RuntimeException("❌ Chat API returned error or non-200 status");
+//            }
+//
+//        } catch (Exception e) {
+//            throw new RuntimeException("⚠️ Error while calling createChat API", e);
+//        }
+//
+//        // Step 3: Interact with iframe and validate response
+//        try {
+//            WebElement iframe = wait.until(ExpectedConditions.presenceOfElementLocated(
+//                    By.xpath("//iframe[contains(@src, 'document-copilot')]")));
+//            driver.switchTo().frame(iframe);
+//
+//            WebElement inputBox = wait.until(ExpectedConditions.elementToBeClickable(
+//                    By.xpath("//textarea[contains(@placeholder, 'Type your')]")));
+//            inputBox.sendKeys(query);
+//            inputBox.sendKeys(Keys.ENTER);
+//
+//            WebElement responseContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(
+//                    By.xpath("//div[contains(@class, 'html-response')]")));
+//            String innerHTML = responseContainer.getAttribute("innerHTML").toLowerCase();
+//
+//            boolean hasHtmlTags = innerHTML.contains("<h1>") || innerHTML.contains("<p>") || innerHTML.contains("<ul>");
+//            boolean hasErrorText = innerHTML.contains("something went wrong while creating chat");
+//
+//            driver.switchTo().defaultContent();
+//
+//            if (hasErrorText || !hasHtmlTags) {
+//                ScreenshotUtil.captureScreenshot("DokGPT_Error");
+//                Assert.fail("❌ Error in response: Something went wrong while creating chat.");
+//            } else {
+//                driver.switchTo().frame(iframe);
+//                ((JavascriptExecutor) driver).executeScript(
+//                        "arguments[0].style.border='2px solid green'; arguments[0].style.background='lightyellow';",
+//                        responseContainer);
+//                ScreenshotUtil.captureScreenshot("DokGPT_Response");
+//                driver.switchTo().defaultContent();
+//            }
+//
+//        } catch (Exception e) {
+//            ScreenshotUtil.captureScreenshot("Unhandled_Exception");
+//            try {
+//                driver.switchTo().defaultContent();
+//            } catch (Exception ignored) {}
+//            throw new RuntimeException("⚠️ Exception during query handling", e);
+//        }
+//    }
+
+//    @Then("user sends query {string} and captures the response screenshot")
+//    public void send_query_and_capture_response_ui_only(String query) {
+//        try {
+//            // Into iframe
+//            WebElement iframe = wait.until(ExpectedConditions.presenceOfElementLocated(
+//                    By.xpath("//iframe[contains(@src, 'document-copilot')]")));
+//            driver.switchTo().frame(iframe);
+//
+//            //  Click the Settings (gear) icon to open configuration
+//            WebElement settingsIcon = wait.until(ExpectedConditions.elementToBeClickable(
+//                    By.xpath("//div[@class='fixed right-6 top-3 z-50']//button")));
+//            settingsIcon.click();
+//
+//            //  Fill in the configuration dropdowns (Settings)
+//            selectDropdownOption("Content Modularity", "Medium");
+//            selectDropdownOption("LLM", "OpenAI GPT 4.1");
+//            selectDropdownOption("Embedding Models", "Cohere multilingual");
+//            selectDropdownOption("Reranking Models", "Cohere Rerank");
+//            selectDropdownOption("Vector DB", "Pinecone");
+//
+//            //Fill namespace (if applicable)
+//            try {
+//                WebElement namespaceInput = wait.until(ExpectedConditions.visibilityOfElementLocated(
+//                        By.xpath("//input[@placeholder='Enter Namespace' or @aria-label='Namespaces']")));
+//                namespaceInput.clear();
+//                namespaceInput.sendKeys("default");
+//            } catch (TimeoutException ignored) {}
+//
+//            //click on body to close the settings configuration
+//            WebElement outsideArea = driver.findElement(By.tagName("body"));
+//            outsideArea.click();
+//
+//            //Type query and send
+//            WebElement inputBox = wait.until(ExpectedConditions.elementToBeClickable(
+//                    By.xpath("//textarea[contains(@placeholder, 'Type your')]")));
+//            inputBox.sendKeys(query);
+//            inputBox.sendKeys(Keys.ENTER);
+//
+//            //Wait for the response to be visible
+//            WebElement responseContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(
+//                    By.xpath("//div[contains(@class, 'html-response')]")));
+//
+//            //Validate and capture screenshot
+//            String innerHTML = responseContainer.getAttribute("innerHTML").toLowerCase();
+//            boolean hasHtmlTags = innerHTML.contains("<h1>") || innerHTML.contains("<p>") || innerHTML.contains("<ul>");
+//            boolean hasErrorText = innerHTML.contains("something went wrong while creating chat");
+//
+//            if (hasErrorText || !hasHtmlTags) {
+//                ScreenshotUtil.captureScreenshot("DokGPT_Error_UI_Only");
+//                Assert.fail("Error in response: Something went wrong.");
+//            } else {
+//                ((JavascriptExecutor) driver).executeScript(
+//                        "arguments[0].style.border='2px solid green'; arguments[0].style.background='lightyellow';",
+//                        responseContainer);
+//                ScreenshotUtil.captureScreenshot("DokGPT_Response_UI_Only");
+//            }
+//
+//            //second Query
+//            //Type query and send
+//            WebElement inputBox1 = wait.until(ExpectedConditions.elementToBeClickable(
+//                    By.xpath("//textarea[contains(@placeholder, 'Type your')]")));
+//            inputBox1.sendKeys("Can you explain how DokGPT handles multilingual queries?");
+//            inputBox1.sendKeys(Keys.ENTER);
+//
+//            //Wait for the response to be visible
+//            WebElement responseContainer1 = wait.until(ExpectedConditions.visibilityOfElementLocated(
+//                    By.xpath("//div[contains(@class, 'html-response')]")));
+//
+//            //Validate and capture screenshot
+//            String innerHTML1 = responseContainer.getAttribute("innerHTML").toLowerCase();
+//            boolean hasHtmlTags1 = innerHTML1.contains("<h1>") || innerHTML1.contains("<p>") || innerHTML1.contains("<ul>");
+//            boolean hasErrorText1 = innerHTML1.contains("something went wrong while creating chat");
+//
+//            if (hasErrorText1 || !hasHtmlTags1) {
+//                ScreenshotUtil.captureScreenshot("DokGPT_Error_UI_Only");
+//                Assert.fail("Error in response: Something went wrong.");
+//            } else {
+//                ((JavascriptExecutor) driver).executeScript(
+//                        "arguments[0].style.border='2px solid green'; arguments[0].style.background='lightyellow';",
+//                        responseContainer1);
+//                ScreenshotUtil.captureScreenshot("DokGPT_Response_UI_Only");
+//            }
+//
+//
+//        } catch (Exception e) {
+//            ScreenshotUtil.captureScreenshot("Unhandled_Exception_UI_Only");
+//            throw new RuntimeException("Exception during query handling via UI", e);
+//        } finally {
+//            try {
+//                driver.switchTo().defaultContent();
+//            } catch (Exception ignored) {}
+//        }
+//    }
