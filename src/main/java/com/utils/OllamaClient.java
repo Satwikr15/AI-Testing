@@ -20,11 +20,17 @@ public class OllamaClient {
         System.out.println("Input Respsonse to OLLAMA : "+prevResponse);
         System.out.println("----------------------------------------------");
         try {
-            String prompt = "You are testing a dataset-driven chatbot.\n"
-                    + "Previous query: \"" + prevQuery + "\"\n"
-                    + "Chatbot response: \"" + prevResponse + "\"\n"
-                    + "Based on this, generate 1 new meaningful user query to test further.\n"
-                    + "Return only the query, no explanation.";
+            String prompt = "You are testing a dataset-driven chatbot that answers analytical questions based on sales data."
+                    + "The dataset includes columns such as Row ID, Order ID, Order Date, Ship Date, Ship Mode, Customer ID, "
+                    + "Customer Name, Segment, Country, City, State, Postal Code, Region, Product ID, Category, Sub-Category, "
+                    + "Product Name, Sales, Quantity, Discount, and Profit."
+                    + "The chatbot should be able to handle descriptive analysis, comparative analysis, and location-based insights."
+                    + "Previous query: \"" + prevQuery + "\""
+                    + "Chatbot response: \"" + prevResponse + "\""
+                    + "Based on this, generate one new meaningful user query that tests the chatbot’s ability to analyze or visualize the dataset further. "
+                    + "The query should sound natural, like a real user asking about sales, profit, customers, categories, or regions."
+                    + "Return only the query text, with no explanation or extra formatting.";
+
 
             JSONObject json = new JSONObject();
             json.put("model", "llama3.2");
