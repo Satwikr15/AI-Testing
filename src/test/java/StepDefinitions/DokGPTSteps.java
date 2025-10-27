@@ -129,22 +129,32 @@ public class DokGPTSteps {
                 // get latest response
                 WebElement responseContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("(//div[contains(@class, 'html-response')])[last()]")));
+
+                // get innerHTML
                 String innerHTML = responseContainer.getAttribute("innerHTML").toLowerCase();
+
+                // checks
                 boolean hasHtmlTags = innerHTML.contains("<h1>") || innerHTML.contains("<p>") || innerHTML.contains("<ul>");
                 boolean hasErrorText = innerHTML.contains("something went wrong");
+                boolean hasNoInfoText = innerHTML.contains("sorry, i couldn’t find any information on that.")
+                        || innerHTML.contains("sorry, i couldn't find any information on that."); // both apostrophe cases
 
-                String borderColor = hasErrorText || !hasHtmlTags ? "red" : "green";
+                // decide color
+                boolean markAsError = hasErrorText || !hasHtmlTags || hasNoInfoText;
+                String borderColor = markAsError ? "red" : "green";
                 String highlightColor = "yellow";
-                String screenshotName = (hasErrorText || !hasHtmlTags)
+                String screenshotName = markAsError
                         ? "Error_" + mode + "_" + index
                         : "Response_" + mode + "_" + index;
 
+                // highlight with JS
                 ((JavascriptExecutor) driver).executeScript(
                         "arguments[0].style.border='2px solid " + borderColor + "';" +
                                 "arguments[0].style.background='" + highlightColor + "';" +
                                 "arguments[0].style.transition='all 0.5s ease-in-out';",
                         responseContainer
                 );
+
 
                 ScreenshotUtil.captureScreenshot(screenshotName);
 
