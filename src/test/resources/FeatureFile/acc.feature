@@ -11,6 +11,31 @@ Feature: Automation of AI Application
 
 
   Scenario: Validation of Karl Application
-    Given Navigate to url
+    Given login process of flip
+    When Navigate to url
+    When Click on Add Connection
+    And agent conversation with Karl
+
+
+  Scenario: Validation Karl Application through CSV import file
+    Given login process of flip
+    When Navigate to url
     When Click on Add Connection
     And user conversation with Karl
+
+    #backend api response testing - backend testing
+
+  # make stepdefinitions less hardcoded.
+  # Page object model
+  # common methods
+  # breakdown the features ???
+  # response validation in conversation !!!! *
+  # classloader for hardcoded file paths
+
+  #-----------------------enhancements-----------------------
+  #need to work on script enhancement(Queries)
+  #Agent accuracy
+  #Include more AI applications
+  #recordings for each execution
+  #parallel execution
+  #
