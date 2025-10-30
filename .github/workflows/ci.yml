@@ -3,7 +3,7 @@ name: Selenium Cucumber CI Pipeline
 on:
   push:
     branches:
-      - Dev   # Trigger pipeline when code is pushed to Dev branch
+      - Dev
   pull_request:
     branches:
       - master
@@ -13,18 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17 (you can change this if you use another version)
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Step 3: Cache Maven dependencies for faster builds
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
@@ -33,11 +30,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2
 
-      # Step 4: Build project and run tests
+      # ✅ Install Chrome browser
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      # ✅ Verify Chrome installation (optional)
+      - name: Check Chrome Version
+        run: google-chrome-stable --version
+
+      # ✅ Run automation tests
       - name: Run Automation Tests
         run: mvn clean test
 
-      # Step 5: Upload test reports (Extent, HTML, or Cucumber)
       - name: Upload Test Reports
         if: always()
         uses: actions/upload-artifact@v4
