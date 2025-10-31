@@ -1,7 +1,9 @@
 package com.utils;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 
@@ -15,14 +17,26 @@ public class DriverFactory {
         if (tlDriver.get() == null) {
             switch (browser.toLowerCase()) {
                 case "chrome":
-                    tlDriver.set(new ChromeDriver());
+                    WebDriverManager.chromedriver().setup();
+                    ChromeOptions options = new ChromeOptions();
+                    // ✅ Headless mode for CI
+                    options.addArguments("--headless=new");
+                    options.addArguments("--no-sandbox");
+                    options.addArguments("--disable-dev-shm-usage");
+                    options.addArguments("--window-size=1920,1080");
+                    tlDriver.set(new ChromeDriver(options));
                     break;
+
                 case "firefox":
+                    WebDriverManager.firefoxdriver().setup();
                     tlDriver.set(new FirefoxDriver());
                     break;
+
                 case "edge":
+                    WebDriverManager.edgedriver().setup();
                     tlDriver.set(new EdgeDriver());
                     break;
+
                 default:
                     throw new IllegalArgumentException("Unsupported browser: " + browser);
             }
@@ -37,6 +51,9 @@ public class DriverFactory {
     }
 
     public static WebDriver getDriver() {
+        if (tlDriver.get() == null) {
+            throw new IllegalStateException("WebDriver is not initialized. Call init_driver() first.");
+        }
         return tlDriver.get();
     }
 
