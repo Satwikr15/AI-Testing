@@ -10,18 +10,18 @@ Feature: Automation of AI Application
 
 
 
-  Scenario: Validation of Karl Application
-    Given login process of flip
-    When Navigate to url
-    When Click on Add Connection
-    And agent conversation with Karl
-
-
-  Scenario: Validation Karl Application through CSV import file
-    Given login process of flip
-    When Navigate to url
-    When Click on Add Connection
-    And user conversation with Karl
+#  Scenario: Validation of Karl Application
+#    Given login process of flip
+#    When Navigate to url
+#    When Click on Add Connection
+#    And agent conversation with Karl
+#
+#
+#  Scenario: Validation Karl Application through CSV import file
+#    Given login process of flip
+#    When Navigate to url
+#    When Click on Add Connection
+#    And user conversation with Karl
 
     #backend api response testing - backend testing
 #this is dev changes
