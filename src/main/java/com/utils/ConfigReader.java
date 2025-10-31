@@ -1,29 +1,35 @@
 package com.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigReader {
 
-    private static Properties prop;
+    private static Properties properties;
 
+    static {
+        initProperties();
+    }
 
-    public static Properties initProperties() {
-        prop = new Properties();
-        try {
-            FileInputStream ip = new FileInputStream("src/test/resources/config/config.properties");
-            prop.load(ip);
+    private static void initProperties() {
+        properties = new Properties();
+        try (InputStream input = ConfigReader.class.getClassLoader()
+                .getResourceAsStream("config.properties")) { // Use classpath
+            if (input == null) {
+                throw new IllegalStateException("config.properties not found in classpath!");
+            }
+            properties.load(input);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load config.properties", e);
         }
-        return prop;
     }
 
     public static String getProperty(String key) {
-        if (prop == null) {
-            initProperties();
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new IllegalStateException("Property '" + key + "' not found in config.properties");
         }
-        return prop.getProperty(key);
+        return value;
     }
 }
